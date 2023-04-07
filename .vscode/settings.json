@@ -1,0 +1,16 @@
+{
+  "editor.formatOnType": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "Vue.volar"
+  },
+  "i18n-ally.localesPaths": [
+    "locales"
+  ],
+  "i18n-ally.keystyle": "nested"
+}

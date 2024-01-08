@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+	<div id="webgl_3d"></div>
+</body>
+<script type="importmap">
+			{
+				"imports": {
+					"three": "../js/three.module.js"
+				}
+			}
+		</script>
+
+<script type="module">
+
+	import * as THREE from 'three';
+	import { GLTFLoader } from '../js/loaders/GLTFLoader.js';
+	import { OrbitControls } from '../js/controls/OrbitControls.js';
+
+	let container, controls;
+	let camera, scene, renderer;
+
+	init();
+	animate();
+
+	function init() {
+
+		container = document.getElementById('webgl_3d');
+		document.body.appendChild(container);
+
+		scene = new THREE.Scene();
+		scene.background = new THREE.Color(0xbbbbbb);
+
+		var ambientLight = new THREE.AmbientLight(0xffffff);
+		scene.add(ambientLight);
+
+		var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+		directionalLight.position.set(1, 1, 1).normalize();
+		scene.add(directionalLight);
+
+		const loader = new GLTFLoader();
+		loader.load('../models/gltf/test.glb', function (gltf) {
+			let object = gltf.scene;
+			scene.add(object);
+		});
+
+		renderer = new THREE.WebGLRenderer();
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.outputEncoding = THREE.sRGBEncoding;
+		container.appendChild(renderer.domElement);
+
+		camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 10);
+		camera.position.z = 2;
+
+		controls = new OrbitControls(camera, renderer.domElement);
+
+		window.addEventListener('resize', resize);
+
+	}
+
+	function resize() {
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+
+	}
+
+	function animate() {
+		renderer.render(scene, camera);
+		requestAnimationFrame(animate);
+
+	}
+</script>
+
+</html>

@@ -20,6 +20,7 @@
 
 	let container, controls;
 	let camera, scene, renderer;
+	let objPos = {};
 
 	init();
 	animate();
@@ -40,10 +41,22 @@
 		scene.add(directionalLight);
 
 		const loader = new GLTFLoader();
-		loader.load('../models/gltf/test.glb', function (gltf) {
+		loader.load('../models/gltf/path.glb', function (gltf) {
 			let object = gltf.scene;
+			object.name = 'animation';
+			// object.visible = false;
 			scene.add(object);
+
+			loader.load('../models/gltf/box.glb', function (gltf) {
+				let object = gltf.scene;
+				object.name = 'box';
+				scene.add(object);
+
+				play('box', 'animation', 'path');
+			});
 		});
+
+
 
 		renderer = new THREE.WebGLRenderer();
 		renderer.setPixelRatio(window.devicePixelRatio);
@@ -57,7 +70,30 @@
 		controls = new OrbitControls(camera, renderer.domElement);
 
 		window.addEventListener('resize', resize);
+	}
 
+	function play(targetName, pathName, pointName, totalSec = 10) {
+		const target = scene.getObjectByName(targetName);
+		objPos[targetName] = [0, 0, 0];
+
+		const obj = scene.getObjectByName(pathName);
+		const path = obj.getObjectByName(pointName);
+		let points = path.geometry.attributes.position.array;
+
+		let qty = points.length / 3;
+		let interMs = totalSec * 1000 / qty;
+		let index = 0;
+		let intervalID = setInterval(function () {
+			objPos[targetName] = [points[index], points[index + 1], points[index + 2]];
+			if (index <= 0) {
+				console.log('start play ', targetName, 'on ', pathName);
+			} else if (index >= 3 * qty) {
+				clearInterval(intervalID);
+				delete objPos[targetName];
+				console.log('end play', targetName, 'on ', pathName);
+			}
+			index += 3;
+		}, interMs);
 	}
 
 	function resize() {
@@ -69,9 +105,16 @@
 
 	function animate() {
 		renderer.render(scene, camera);
+		for (let name in objPos) {
+			const target = scene.getObjectByName(name);
+			let points = objPos[name];
+			target.position.x = points[0];
+			target.position.y = points[1];
+			target.position.z = points[2];
+		}
 		requestAnimationFrame(animate);
-
 	}
+
 </script>
 
 </html>
